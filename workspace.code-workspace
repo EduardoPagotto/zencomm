@@ -1,0 +1,159 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		// open file with double click only
+		//"workbench.editor.enablePreview": false,
+		//"workbench.list.openMode": "doubleClick",
+		"workbench.colorCustomizations": {
+			"editorCursor.foreground": "#ffff00",
+			"editorCursor.background": "#ff0000",
+			"terminalCursor.foreground": "#ffff00",
+			"terminalCursor.background": "#ff0000"
+		},
+		// Remove editor distractions
+		"editor.cursorBlinking": "blink",
+		"editor.cursorSmoothCaretAnimation": "on",
+		"editor.cursorStyle": "line",
+		"editor.hover.enabled": false, // hover manual crt+k, crt+i
+		"editor.occurrencesHighlight": "off", // off disable highligh
+		"editor.selectionHighlight": false, // True show similar selectec
+		"editor.suggestOnTriggerCharacters": false,
+		"editor.acceptSuggestionOnEnter": "smart",
+		"editor.acceptSuggestionOnCommitCharacter": false,
+		"editor.bracketPairColorization.enabled": true,
+		"editor.guides.bracketPairs": true,
+		"editor.quickSuggestions": {
+			"other": "off",
+			"comments": "off",
+			"strings": "off"
+		},
+		"editor.inlineSuggest.enabled": false,
+		"editor.suggest.preview": false,
+		"editor.snippetSuggestions": "none",
+		"editor.wordBasedSuggestions": "off",
+		"editor.minimap.enabled": false,
+		// Font settings
+		"editor.fontFamily": "JetBrains Mono",
+		"editor.fontSize": 15,
+		"editor.fontWeight": "normal",
+		"editor.fontLigatures": true,
+		"editor.letterSpacing": 0.8,
+		"editor.lineHeight": 1.5,
+		// misc
+		"editor.rulers": [
+			120
+		],
+		"editor.formatOnSave": true,
+		"editor.tabSize": 4,
+		"editor.smoothScrolling": true,
+		// Terminal
+		"terminal.integrated.letterSpacing": 0.8,
+		"terminal.integrated.fontWeight": "normal",
+		"terminal.integrated.defaultProfile.windows": "Command Prompt",
+		"terminal.integrated.fontFamily": "JetBrains Mono",
+		"terminal.integrated.fontLigatures.enabled": true,
+		"terminal.integrated.lineHeight": 1.0,
+		"terminal.integrated.fontSize": 15,
+		"terminal.integrated.cursorStyle": "line",
+		"terminal.integrated.cursorBlinking": true,
+		"terminal.integrated.cursorStyleInactive": "line",
+		// Explorer
+		"explorer.compactFolders": false,
+		"explorer.confirmDragAndDrop": true,
+		"explorer.confirmDelete": true,
+		"explorer.copyRelativePathSeparator": "/",
+		// Files
+		"files.autoSave": "onFocusChange",
+		"files.insertFinalNewline": true,
+		"files.trimFinalNewlines": true,
+		"files.trimTrailingWhitespace": true,
+		// Git
+		"git.enableSmartCommit": true,
+		"git.autofetch": true,
+		"git.confirmSync": true,
+		"git.openRepositoryInParentFolders": "always",
+		// Error Lens
+		"errorLens.enabled": true,
+		"errorLens.delay": 1000,
+		"errorLens.delayMode": "new",
+		"errorLens.enabledDiagnosticLevels": [
+			"error",
+			"warning"
+		],
+		"errorLens.problemRangeDecorationEnabled": true,
+		"errorLens.gutterIconsEnabled": true,
+		"errorLens.followCursor": "activeLine",
+		"errorLens.gutterIconsFollowCursorOverride": true,
+		"errorLens.decorations": {
+			"errorRange": {
+				"border": "1px dashed red",
+				"backgroundColor": "#ff000090",
+				"color": "#ffffff"
+			},
+			"warningRange": {
+				"border": "2px dotted #fa9121"
+			},
+			"infoRange": {
+				"textDecoration": ";background:linear-gradient(45deg,#ff8400,#00d9ff);background-clip:text;color:transparent;border-bottom:2px solid #00d9ff",
+				"backgroundColor": "#fff0"
+			},
+			"hintRange": {
+				"textDecoration": ";box-shadow:0 0 5px 3px #2faf6470;border-radius:0.25em"
+			}
+		},
+		//
+		// PYTHON extra libs
+		// "python.analysis.extraPaths": [
+		// 	"./app/"
+		// ],
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Current File",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal"
+			},
+			{
+				"name": "Client",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/text/client.py",
+				"console": "integratedTerminal",
+				"args": []
+			},
+			{
+				"name": "Server",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/test/server.py",
+				"console": "integratedTerminal",
+				"args": []
+			},
+			{
+				"name": "AsyncServer",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/async_server.py",
+				"console": "integratedTerminal",
+				"args": []
+			},
+			{
+				"name": "AsyncClient",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/async_client.py",
+				"console": "integratedTerminal",
+				"args": []
+			}
+		],
+		"compounds": []
+	}
+}
