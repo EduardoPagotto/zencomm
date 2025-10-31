@@ -1,6 +1,6 @@
 '''
 Created on 20241001
-Update on 20251030
+Update on 20251031
 @author: Eduardo Pagotto
 '''
 
@@ -13,12 +13,6 @@ class Chunk(object):
         self.__writer = writer
 
     async def sendBlocks(self, _buffer : bytes) -> int:
-        """[Send chunk's to host connected]
-        Args:
-            _buffer (bytes): [Data to transfer]
-        Returns:
-            int: [Total receved]
-        """
 
         total_enviado : int = 0
         total_buffer :int = len(_buffer)
@@ -39,14 +33,6 @@ class Chunk(object):
         return total_enviado
 
     async def receiveBlocks(self, _tamanho : int) -> bytes:
-        """[Receive chunk's from host connected]
-        Args:
-            _tamanho (int): [total to receve]
-        Raises:
-            ExceptionZero: [Raise if chunk's fail]
-        Returns:
-            bytes: [Buffer with data receved]
-        """
 
         total_recebido : int = 0
         buffer_local : bytes = bytes()
@@ -59,7 +45,7 @@ class Chunk(object):
             chunk : bytes = await self.__reader.readexactly(tam)
 
             if chunk == b'':
-                raise Exception("Fail Receive a chunk")
+                raise Exception("receive empty block")
 
             buffer_local += chunk
 
