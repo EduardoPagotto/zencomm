@@ -1,6 +1,6 @@
 '''
 Created on 20241001
-Update on 20251010
+Update on 20251031
 @author: Eduardo Pagotto
 '''
 
@@ -26,8 +26,8 @@ def get_async_logger(name: Optional[str] = None) -> Logger:
     Path('./log').mkdir(parents=True, exist_ok=True)
 
     log_format = Formatter(
-        fmt="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
+        fmt="%(asctime)s %(levelname)s %(name)s\t\t %(message)s",
+        datefmt="%Y%m%d %H:%M:%S"
     )
 
     stdout_handler = AsyncStreamHandler(stream=sys.stdout)
