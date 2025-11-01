@@ -5,28 +5,70 @@ Update on 20251031
 '''
 
 from typing import Tuple
-
 from zen.header import ProtocolCode, Header, HEADER_SIZE
-from zen.chunk import Chunk
 
-class Protocol(Chunk):
+BLOCK_SIZE = 2048
+
+class Protocol(object):
 
     def __init__(self, reader, writer):
-        super().__init__(reader, writer)
+        self.__reader = reader
+        self.__writer = writer
+
+    async def __sendBlocks(self, _buffer : bytes) -> int:
+
+        total_enviado : int = 0
+        total_buffer :int = len(_buffer)
+        while total_enviado < total_buffer:
+            tam : int = total_buffer - total_enviado
+            if tam > BLOCK_SIZE:
+                tam = BLOCK_SIZE
+
+            inicio = total_enviado
+            fim = total_enviado + tam
+
+            sub_buffer = bytearray(_buffer[inicio:fim])
+            self.__writer.write(sub_buffer)
+            await self.__writer.drain()
+
+            total_enviado = fim
+
+        return total_enviado
+
+    async def __receiveBlocks(self, _tamanho : int) -> bytes:
+
+        total_recebido : int = 0
+        buffer_local : bytes = bytes()
+
+        while total_recebido < _tamanho:
+            tam : int = _tamanho - total_recebido
+            if tam > BLOCK_SIZE:
+                tam = BLOCK_SIZE
+
+            chunk : bytes = await self.__reader.readexactly(tam)
+
+            if chunk == b'':
+                raise Exception("receive empty block")
+
+            buffer_local += chunk
+
+            total_recebido = len(buffer_local)
+
+        return buffer_local
 
     async def _sendProtocol(self, _id : ProtocolCode, _buffer : bytes) -> int:
 
         header = Header(id=_id)
 
-        return await self.sendBlocks(header.pack(_buffer))
+        return await self.__sendBlocks(header.pack(_buffer))
 
     async def _receiveProtocol(self) -> Tuple[ProtocolCode, bytes]:
 
         header = Header()
 
-        header.receive(await self.receiveBlocks(HEADER_SIZE))
+        header.receive(await self.__receiveBlocks(HEADER_SIZE))
 
-        binario = header.unpack(await self.receiveBlocks(header.size_zip))
+        binario = header.unpack(await self.__receiveBlocks(header.size_zip))
 
         if header.id == ProtocolCode.OPEN:
             msg = binario.decode('UTF-8')
@@ -42,6 +84,10 @@ class Protocol(Chunk):
             raise Exception('{0}'.format(binario.decode('UTF-8')))
 
         return header.id, binario
+
+    async def close(self):
+        self.__writer.close()
+        await self.__writer.wait_closed()
 
     async def sendString(self, _id : ProtocolCode, _texto : str) -> int:
 
