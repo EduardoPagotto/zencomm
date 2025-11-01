@@ -6,7 +6,7 @@ Update on 20251031
 
 from typing import Tuple
 
-from zen.header import ProtocolCode,Header,HEADER_SIZE
+from zen.header import ProtocolCode, Header, HEADER_SIZE
 from zen.chunk import Chunk
 
 class Protocol(Chunk):

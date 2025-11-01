@@ -9,35 +9,13 @@ import asyncio
 from urllib.parse import urlparse
 
 from zen import get_async_logger
-from zen.protocol import Protocol, ProtocolCode
+from zen.protocol import Protocol
+from zen.header import ProtocolCode
+from zen.socket import socket_client
 
 URL = 'unix:///tmp/teste0.sock'
 
 logger = get_async_logger('zen')
-
-async def create_client_connection(parsed_url : urlparse, timeout : int) -> tuple[any]:
-
-    if parsed_url.scheme == "tcp":
-
-        reader, writer = await asyncio.wait_for(
-            asyncio.open_connection(host=parsed_url.hostname, port=parsed_url.port),
-            timeout=timeout
-        )
-
-        return reader, writer
-
-    elif parsed_url.scheme == "unix":
-
-        final = parsed_url.path if not parsed_url.hostname else f'.{parsed_url.path}'
-        reader, writer = await asyncio.wait_for(
-            asyncio.open_unix_connection(path=final),
-            timeout=timeout
-        )
-
-        return reader, writer
-
-    else:
-        raise Exception(f"scheme  {parsed_url.scheme} invalid")
 
 
 async def main():
@@ -48,7 +26,7 @@ async def main():
     parsed_url = urlparse(URL)
 
     try:
-        reader, writer = await create_client_connection(parsed_url, timeout)
+        reader, writer = await socket_client(parsed_url, timeout)
         if reader and writer:
 
                 p = Protocol(reader, writer)

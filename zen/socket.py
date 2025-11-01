@@ -4,70 +4,108 @@ Update on 20251030
 @author: Eduardo Pagotto
 '''
 
-import logging
 import os
+import asyncio
+import signal
 from urllib.parse import urlparse
 
-import asyncio
+from zen import get_async_logger
 
 class SocketServer(object):
-    def __init__(self, url):
-        self.url = url
-        self.log = logging.getLogger('Zero')
+    def __init__(self, url : str, func_handler):
+        self.parsed_url : urlparse = urlparse(url)
+        self.func_handler = func_handler
+        self.log = get_async_logger()
 
-    async def entry_point(self, func, *args, **kwargs):
-        await func(*args, **kwargs)
-
-    async def __handle_client(self, reader, writer):
-        await self.entry_point(reader=reader, writer=writer)
-
-    async def __main_tcp(self, host, port):
+    async def __main_tcp(self):
         """
         Starts an asyncio TCP server.
         """
-        server = await asyncio.start_server(self.__handle_client, host, port)
+        host = self.parsed_url.hostname
+        port = self.parsed_url.port
+
+        server = await asyncio.start_server(self.func_handler, host, port)
         addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
-        self.log.info(f"Serving on {addrs}")
+
+        await self.log.info(f"Serving on {addrs}")
 
         async with server:
             await server.serve_forever()
 
-    async def __main_uds(self, path):
+    async def __main_unix(self):
         """
         Starts an asyncio Unix Domain Socket server.
         """
+        path = self.parsed_url.path if not self.parsed_url.hostname else f'.{self.parsed_url.path}'
+
         if os.path.exists(path):
-            os.remove(path)  # Clean up previous socket file if it exists
+            os.remove(path)
 
-        server = await asyncio.start_unix_server(self.__handle_client, path)
-        self.log.info(f"Serving on UDS: {path}")
-
+        server = await asyncio.start_unix_server(self.func_handler, path)
         async with server:
-            await server.serve_forever()
 
-    async def create_socket(self):
+            await self.log.info(f"Serving on {self.parsed_url.geturl()}")
 
-        parsed_url = urlparse(self.url)
+            #await server.serve_forever()
+            # Create a task for serve_forever to allow it to be cancelled
+            serve_task = asyncio.create_task(server.serve_forever())
 
-        if parsed_url.scheme == "tcp":
-            asyncio.run(self.__main_tcp(parsed_url.hostname, parsed_url.port))
+            # Set up a signal handler for graceful shutdown
+            loop = asyncio.get_running_loop()
+            stop_event = asyncio.Event()
 
-        elif parsed_url.scheme == "uds":
-            asyncio.run(self.__main_uds(parsed_url.path if not parsed_url.hostname else f'.{parsed_url.path}'))
+            def signal_handler():
+                #await self.log.warning("Shutdown signal received...")
+                stop_event.set()
+
+            loop.add_signal_handler(signal.SIGINT, signal_handler)
+            loop.add_signal_handler(signal.SIGTERM, signal_handler)
+
+            await stop_event.wait() # Wait for the shutdown signal
+
+            self.log.info("Closing server...")
+            server.close()  # Stop accepting new connections
+            await server.wait_closed() # Wait for existing connections to close gracefully
+
+            # Cancel the serve_forever task
+            serve_task.cancel()
+            try:
+                await serve_task
+            except asyncio.CancelledError:
+                self.log.warning("serve_forever task cancelled")
+
+    async def execute(self):
+
+        if self.parsed_url.scheme == "tcp":
+            return await self.__main_tcp()
+
+        elif self.parsed_url.scheme == "unix":
+            return await self.__main_unix()
 
         else:
-            self.log.info("Invalid SERVER_TYPE. Choose 'TCP' or 'UDS'.")
+            await self.log.info("Invalid SERVER_TYPE. Choose 'TCP' or 'UNIX'.")
 
 
-async def create_client_connection(url : str) -> tuple[any]:
-
-    parsed_url = urlparse(url)
+async def socket_client(parsed_url : urlparse, timeout : int) -> tuple[any]:
 
     if parsed_url.scheme == "tcp":
-        return  await asyncio.open_connection(host=parsed_url.hostname, port=parsed_url.port)
 
-    elif parsed_url.scheme == "uds":
-        return await asyncio.open_unix_connection(parsed_url.path if not parsed_url.hostname else f'.{parsed_url.path}')
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(host=parsed_url.hostname, port=parsed_url.port),
+            timeout=timeout
+        )
+
+        return reader, writer
+
+    elif parsed_url.scheme == "unix":
+
+        final = parsed_url.path if not parsed_url.hostname else f'.{parsed_url.path}'
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_unix_connection(path=final),
+            timeout=timeout
+        )
+
+        return reader, writer
 
     else:
-        raise Exception("Falha de conexao")
+        raise Exception(f"scheme  {parsed_url.scheme} invalid")
