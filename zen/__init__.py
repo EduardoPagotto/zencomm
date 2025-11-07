@@ -1,13 +1,11 @@
 '''
 Created on 20241001
-Update on 20251031
+Update on 20251107
 @author: Eduardo Pagotto
 '''
 
 import sys
-from typing import Optional
 from aiologger import Logger
-from aiologger.handlers.files import AsyncFileHandler
 from aiologger.formatters.base import Formatter
 from aiologger.handlers.streams import AsyncStreamHandler
 from aiologger.levels import LogLevel
@@ -16,7 +14,7 @@ from pathlib import Path
 
 _glogger = None
 
-def get_async_logger(name: Optional[str] = None) -> Logger:
+def get_async_logger(name: str = '') -> Logger:
 
     global _glogger
 

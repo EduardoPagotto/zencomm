@@ -1,6 +1,6 @@
 '''
 Created on 20241001
-Update on 20251031
+Update on 20251107
 @author: Eduardo Pagotto
 '''
 
@@ -14,6 +14,8 @@ class Protocol(object):
     def __init__(self, reader, writer):
         self.__reader = reader
         self.__writer = writer
+        self.version = '0.0.1'
+        self.peer_version = ''
 
     async def __sendBlocks(self, _buffer : bytes) -> int:
 
@@ -71,9 +73,9 @@ class Protocol(object):
         binario = header.unpack(await self.__receiveBlocks(header.size_zip))
 
         if header.id == ProtocolCode.OPEN:
-            msg = binario.decode('UTF-8')
+            self.peer_version = binario.decode('UTF-8')
             #self.log.debug('handshake with host:%s', msg)
-            await self.sendString(ProtocolCode.RESULT, self.protocol_versao)
+            await self.sendString(ProtocolCode.RESULT, self.version)
 
         elif header.id == ProtocolCode.CLOSE:
             #self.log.debug('closure receved:%s', binario.decode('UTF-8'))
@@ -83,7 +85,7 @@ class Protocol(object):
         elif header.id == ProtocolCode.ERRO:
             raise Exception('{0}'.format(binario.decode('UTF-8')))
 
-        return header.id, binario
+        return ProtocolCode(header.id), binario
 
     async def close(self):
         self.__writer.close()
@@ -105,7 +107,7 @@ class Protocol(object):
 
     async def handShake(self) -> str:
 
-        await self.sendString(ProtocolCode.OPEN, self.protocol_versao)
+        await self.sendString(ProtocolCode.OPEN, self.version)
         idRecive, msg = await self.receiveString()
         if idRecive is ProtocolCode.RESULT:
             #self.log.info('handshake with server: %s', msg)

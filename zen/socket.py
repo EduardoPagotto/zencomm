@@ -13,7 +13,7 @@ from zen import get_async_logger
 
 class SocketServer(object):
     def __init__(self, url : str, func_handler):
-        self.parsed_url : urlparse = urlparse(url)
+        self.parsed_url = urlparse(url)
         self.func_handler = func_handler
         self.log = get_async_logger()
 
@@ -86,7 +86,7 @@ class SocketServer(object):
             await self.log.info("Invalid SERVER_TYPE. Choose 'TCP' or 'UNIX'.")
 
 
-async def socket_client(parsed_url : urlparse, timeout : int) -> tuple[any]:
+async def socket_client(parsed_url : urlparse, timeout : int) -> tuple[asyncio.StreamReader, asyncio.StreamWriter]: # pyright: ignore[reportGeneralTypeIssues]
 
     if parsed_url.scheme == "tcp":
 
