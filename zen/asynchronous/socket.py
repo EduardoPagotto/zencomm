@@ -9,7 +9,7 @@ import asyncio
 import signal
 from urllib.parse import urlparse
 
-from zen import get_async_logger
+from zen.asynchronous import get_async_logger
 
 class SocketServer(object):
     def __init__(self, url : str, func_handler):
@@ -108,4 +108,4 @@ async def socket_client(parsed_url : urlparse, timeout : int) -> tuple[asyncio.S
         return reader, writer
 
     else:
-        raise Exception(f"scheme  {parsed_url.scheme} invalid")
+        raise Exception(f"scheme {parsed_url.scheme} invalid")

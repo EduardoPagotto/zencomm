@@ -7,10 +7,10 @@ Update on 20251031
 
 import asyncio
 
-from zen import get_async_logger
-from zen.protocol import Protocol
 from zen.header import ProtocolCode
-from zen.socket import SocketServer
+from zen.asynchronous import get_async_logger
+from zen.asynchronous.protocol import Protocol
+from zen.asynchronous.socket import SocketServer
 
 URL = 'unix:///tmp/teste0.sock'
 

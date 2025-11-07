@@ -8,10 +8,11 @@ Update on 20251107
 import asyncio
 from urllib.parse import urlparse
 
-from zen import get_async_logger
-from zen.protocol import Protocol
 from zen.header import ProtocolCode
-from zen.socket import socket_client
+
+from zen.asynchronous import get_async_logger
+from zen.asynchronous.protocol import Protocol
+from zen.asynchronous.socket import socket_client
 
 URL = 'unix:///tmp/teste0.sock'
 

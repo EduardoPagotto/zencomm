@@ -20,6 +20,7 @@ class ProtocolCode(IntEnum):
     ERRO = 255
 
 HEADER_SIZE = 32
+BLOCK_SIZE = 2048
 
 @dataclass
 class Header:

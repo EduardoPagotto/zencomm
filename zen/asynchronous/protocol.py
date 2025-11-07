@@ -5,9 +5,7 @@ Update on 20251107
 '''
 
 from typing import Tuple
-from zen.header import ProtocolCode, Header, HEADER_SIZE
-
-BLOCK_SIZE = 2048
+from zen.header import ProtocolCode, Header, HEADER_SIZE, BLOCK_SIZE
 
 class Protocol(object):
 
