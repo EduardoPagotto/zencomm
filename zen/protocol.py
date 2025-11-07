@@ -62,15 +62,15 @@ class Protocol(object):
 
         header = Header(id=_id)
 
-        return await self.__sendBlocks(header.pack(_buffer))
+        return await self.__sendBlocks(header.encode(_buffer))
 
     async def _receiveProtocol(self) -> Tuple[ProtocolCode, bytes]:
 
         header = Header()
 
-        header.receive(await self.__receiveBlocks(HEADER_SIZE))
+        header.decode_h(await self.__receiveBlocks(HEADER_SIZE))
 
-        binario = header.unpack(await self.__receiveBlocks(header.size_zip))
+        binario = header.decode_d(await self.__receiveBlocks(header.size_zip))
 
         if header.id == ProtocolCode.OPEN:
             self.peer_version = binario.decode('UTF-8')

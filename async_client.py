@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20251030
-Update on 20251031
+Update on 20251107
 @author: Eduardo Pagotto
 '''
 
@@ -54,22 +54,23 @@ async def main():
     except ConnectionResetError:
         logger.error(f"Client {parsed_url.geturl()} forcibly closed the connection.")
 
+    # except asyncio.CancelledError:
+    #     logger.error("Client task cancelled gracefully..")
+
     except Exception as e:
         logger.error(f"An unexpected error occurred: {str(e)}")
 
-    # except KeyboardInterrupt:
-    #     logger.error("Server shutting down gracefully...")
+    finally:
+        await logger.info("client stop.")
 
-    await logger.info("client stop.")
     await logger.shutdown()
 
 
 if __name__ == "__main__":
-    #asyncio.run(main())
 
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("\nServer shutting down gracefully...")
+        print("Client shutting down gracefully...")
     except asyncio.CancelledError:
-        print("\nServer task cancelled gracefully...")
+        print("Client task cancelled gracefully...")

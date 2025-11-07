@@ -1,6 +1,6 @@
 '''
 Created on 20251031
-Update on 20251031
+Update on 20251107
 @author: Eduardo Pagotto
 '''
 
@@ -32,28 +32,7 @@ class Header:
     resi2: int = 0     # [6]   # 24,25,26,27
     crc_header: int = 0# [7]   # 28,29,30,31
 
-
-    def receive(self, data_in : bytes):
-
-        buffer_header = bytearray(data_in)
-
-        formatoHeader = struct.Struct('I I I I I I I I')
-        headerTuple = formatoHeader.unpack(buffer_header)
-
-        self.id = ProtocolCode(int(headerTuple[0]))
-        self.size = int(headerTuple[1])
-        self.size_zip = int(headerTuple[2])
-        self.crc_zip = int(headerTuple[3])
-        self.crc_header = int(headerTuple[7])
-
-        inner_fields = buffer_header[:28] # ou 27??
-        crc_header_recive = zlib.crc32(inner_fields)
-
-        if self.crc_header != crc_header_recive:
-            raise Exception('wrong header crc')
-
-
-    def pack(self, buffer : bytes) -> bytes:
+    def encode(self, buffer : bytes) -> bytes:
 
         # zip data
         zipped : bytes = zlib.compress(buffer)
@@ -76,7 +55,26 @@ class Header:
 
         return buffer_complet
 
-    def unpack(self, buffer : bytes) -> bytes:
+    def decode_h(self, data_in : bytes):
+
+        buffer_header = bytearray(data_in)
+
+        formatoHeader = struct.Struct('I I I I I I I I')
+        headerTuple = formatoHeader.unpack(buffer_header)
+
+        self.id = ProtocolCode(int(headerTuple[0]))
+        self.size = int(headerTuple[1])
+        self.size_zip = int(headerTuple[2])
+        self.crc_zip = int(headerTuple[3])
+        self.crc_header = int(headerTuple[7])
+
+        inner_fields = buffer_header[:28] # ou 27??
+        crc_header_recive = zlib.crc32(inner_fields)
+
+        if self.crc_header != crc_header_recive:
+            raise Exception('wrong header crc')
+
+    def decode_d(self, buffer : bytes) -> bytes:
         buffer_dados = bytearray(buffer)
 
         crcCalc = zlib.crc32(buffer_dados)
