@@ -4,68 +4,52 @@ Update on 20251107
 @author: Eduardo Pagotto
 '''
 
-import logging
 import os
-import socket
 
-import sys
+from socket import socket, AF_INET, AF_UNIX, SOCK_STREAM
 from urllib.parse import urlparse
 
-class SocketServer(object):
-    def __init__(self, url : str, timeout : float):
-        self.parsed_url = urlparse(url)
-        self.timeout = timeout
-        self.log = logging.getLogger('zen')
+def socket_server(parsed_url: urlparse, timeout : float, listen_val: int) -> socket: # pyright: ignore[reportGeneralTypeIssues]
 
-    def __main_tcp(self):
-        host = self.parsed_url.hostname
-        port = self.parsed_url.port
+    soc = None
+    if parsed_url.scheme == "tcp":
 
-        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        soc.settimeout(self.timeout)
+        host = parsed_url.hostname
+        port = parsed_url.port
+
+        soc = socket(AF_INET, SOCK_STREAM)
+        soc.settimeout(timeout)
 
         # TODO: get by hostname
         #soc.bind((soc.getSocket().gethostname(), porta))
         soc.bind((host, port))
 
-        return soc
+    elif parsed_url.scheme == "unix":
 
-
-    def __main_unix(self):
-        path = self.parsed_url.path if not self.parsed_url.hostname else f'.{self.parsed_url.path}'
+        path = parsed_url.path if not parsed_url.hostname else f'.{parsed_url.path}'
 
         if os.path.exists(path):
             os.remove(path)
 
-        soc = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        soc.settimeout(self.timeout)
+        soc = socket(AF_UNIX, SOCK_STREAM)
+        soc.settimeout(timeout)
         soc.bind(path)
 
-        return soc
+    else:
+        raise Exception(f"scheme {parsed_url.scheme} invalid")
 
-    def create(self, listen_val: int) :
+    soc.listen(listen_val)
 
-        soc = None
-        if self.parsed_url.scheme == "tcp":
-            soc = self.__main_tcp()
-        elif self.parsed_url.scheme == "unix":
-            soc = self.__main_unix()
-        else:
-            self.log.info("Invalid SERVER_TYPE. Choose 'TCP' or 'UNIX'.")
-            return None
+    return soc
 
-        soc.listen(listen_val)
+# # TODO: implementar a continuação do inetd,
+# # neste caso a conexao ja é a final, indo direto para o protocolo
+# def inetd_conn(self):
+#     soc = socket.fromfd(sys.stdin.fileno(), socket.AF_INET, socket.SOCK_STREAM)
+#     server_address = soc.getsockname()
+#     self.log.debug('Connected in: %s', str(server_address))
 
-        return soc
-
-    # # TODO: implementar a continuação do inetd,
-    # # neste caso a conexao ja é a final, indo direto para o protocolo
-    # def inetd_conn(self):
-    #     soc = socket.fromfd(sys.stdin.fileno(), socket.AF_INET, socket.SOCK_STREAM)
-    #     server_address = soc.getsockname()
-    #     self.log.debug('Connected in: %s', str(server_address))
-
-    #     return soc
+#     return soc
 
 
 def socket_client(parsed_url : urlparse, timeout : int): # pyright: ignore[reportGeneralTypeIssues]
@@ -74,7 +58,7 @@ def socket_client(parsed_url : urlparse, timeout : int): # pyright: ignore[repor
     if parsed_url.scheme == "tcp":
         host = parsed_url.hostname
         port = parsed_url.port
-        soc = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        soc = socket(AF_UNIX, SOCK_STREAM)
         soc.settimeout(float(timeout))
         soc.connect((host, port))
 
@@ -82,7 +66,7 @@ def socket_client(parsed_url : urlparse, timeout : int): # pyright: ignore[repor
 
         path = parsed_url.path if not parsed_url.hostname else f'.{parsed_url.path}'
 
-        soc = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        soc = socket(AF_UNIX, SOCK_STREAM)
         soc.settimeout(float(timeout))
         soc.connect(path)
 

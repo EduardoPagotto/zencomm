@@ -152,6 +152,14 @@
 				"program": "${workspaceFolder}/async_client.py",
 				"console": "integratedTerminal",
 				"args": []
+			},
+			{
+				"name": "SyncServer",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/server.py",
+				"console": "integratedTerminal",
+				"args": []
 			}
 		],
 		"compounds": []
