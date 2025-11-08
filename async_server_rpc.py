@@ -40,9 +40,6 @@ async def main():
     server = ServerRPC(URL)
     await server.execute()
 
-    #server = SocketServer(URL,handle_client)
-    #await server.execute()
-
     await logger.info("server stop.")
     await logger.shutdown()
 

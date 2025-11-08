@@ -5,13 +5,9 @@ Update on 20210212
 '''
 
 from typing import Any
-import asyncio
 
-
-from .ConnectionControl import ConnectionControl
 from .RPC_Call import RPC_Call
-
-
+from .ConnectionControl import ConnectionControl
 
 class ProxyObject(object):
     """[Client Proxy Wrapper]
@@ -28,10 +24,7 @@ class ProxyObject(object):
         Returns:
             RPC_Call: [object wrapper]
         """
-
-        #async def fetch_attribute_async():
         return RPC_Call(name, self.conn_control)
-        #return fetch_attribute_async()
 
     def __setattr__(self, name : str, value : Any) -> None:
         """[New Sttribute]

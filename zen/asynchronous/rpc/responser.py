@@ -6,6 +6,7 @@ Update on 20251108
 
 import socket
 import json
+import threading
 
 from zen import ExceptZen, __json_rpc_version__ as json_rpc_version
 
@@ -30,17 +31,16 @@ class Responser(object):
     async def __call__(self, *args, **kargs):
         """[execute exchange of json's messages with server RPC]
         """
-        #done = args[2]
 
-        await self.log.info('start responcer')
+        t_name = threading.current_thread().name
+        self.log.info(f'start {t_name}')
 
         protocol = None
         try:
             protocol = Protocol(args[0], args[1])
-            #protocol.settimeout(30)
 
         except Exception as exp:
-            self.log.critical('fail creating connection: %s', str(exp))
+            await self.log.critical('fail creating connection: %s', str(exp))
             return
 
         count_to = 0
@@ -53,28 +53,20 @@ class Responser(object):
                     await protocol.sendString(ProtocolCode.RESULT, await self.rpc_exec_func(buffer.decode('UTF-8'), protocol))
 
                 elif idRec == ProtocolCode.CLOSE:
-                    await self.log.debug(f'responser receive {buffer.decode('UTF-8')}')
+                    self.log.debug(f'responser receive {buffer.decode('UTF-8')}')
                     break
-
-            # except ExceptionZeroErro as exp_erro:
-            #     self.log.error('%s recevice erro: %s',t_name, str(exp_erro))
-            #     await protocol.sendString(ProtocolCode.RESULT, 'recived error from server')
-
-            # except ExceptionZeroClose as exp_close:
-            #     self.log.warning('%s %s',t_name, str(exp_close))
-            #     break
 
             except socket.timeout:
                 count_to += 1
-                self.log.warning('responser TO count: %d', count_to)
+                self.log.warning('%s TO count: %d', t_name, count_to)
 
             except Exception as exp:
-                self.log.error('responser exception error: %s', str(exp))
+                self.log.error('%s exception error: %s', t_name, str(exp))
                 break
 
         await protocol.close()
 
-        self.log.info('responser finnished')
+        await self.log.info(f'{t_name} finnished')
 
     async def rpc_exec_func(self, msg : str, protocol : Protocol) -> str:
         """[Execule methodo local with paramters in json data (msg)]

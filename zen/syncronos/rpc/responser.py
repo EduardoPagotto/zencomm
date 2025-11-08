@@ -1,13 +1,12 @@
 '''
 Created on 20190824
-Update on 20220917
+Update on 20251108
 @author: Eduardo Pagotto
 '''
 
 import socket
 import json
-
-#import threading
+import threading
 
 from zen import ExceptZen, __json_rpc_version__ as json_rpc_version
 
@@ -32,15 +31,13 @@ class Responser(object):
     def __call__(self, *args, **kargs):
         """[execute exchange of json's messages with server RPC]
         """
-        #done = args[2]
 
-        t_name = 'responcer' #threading.current_thread().name
-        self.log.info('%s start %s', t_name)
+        t_name = threading.current_thread().name
+        self.log.info(f'start {t_name}')
 
         protocol = None
         try:
             protocol = Protocol(args[0])
-            #protocol.settimeout(30)
 
         except Exception as exp:
             self.log.critical('fail creating connection: %s', str(exp))
@@ -48,20 +45,16 @@ class Responser(object):
 
         count_to = 0
 
-        while True: # FIXME: parar como ?
+        while True:
             try:
                 count_to = 0
                 idRec, buffer = protocol._receiveProtocol()
-                if idRec is ProtocolCode.COMMAND:
+                if idRec == ProtocolCode.COMMAND:
                     protocol.sendString(ProtocolCode.RESULT, self.rpc_exec_func(buffer.decode('UTF-8'), protocol))
 
-            # except ExceptionZeroErro as exp_erro:
-            #     self.log.error('%s recevice erro: %s',t_name, str(exp_erro))
-            #     await protocol.sendString(ProtocolCode.RESULT, 'recived error from server')
-
-            # except ExceptionZeroClose as exp_close:
-            #     self.log.warning('%s %s',t_name, str(exp_close))
-            #     break
+                elif idRec == ProtocolCode.CLOSE:
+                    self.log.debug(f'responser receive {buffer.decode('UTF-8')}')
+                    break
 
             except socket.timeout:
                 count_to += 1
@@ -73,7 +66,7 @@ class Responser(object):
 
         protocol.close()
 
-        self.log.info('%s finnished', t_name)
+        self.log.info(f'{t_name} finnished')
 
     def rpc_exec_func(self, msg : str, protocol : Protocol) -> str:
         """[Execule methodo local with paramters in json data (msg)]
@@ -91,10 +84,6 @@ class Responser(object):
 
         except Exception as exp3:
             return json.dumps({'jsonrpc': json_rpc_version, 'error': {'code': -32603, 'message': 'Not json: ' + str(exp3)}, 'id': 0})
-
-        # suffix used to add protocol used to extra communication with peer
-        # if '_Xfer' in metodo:
-        #     dados['params'].append(protocol)
 
         try:
             val = getattr(self.target, metodo)(*dados['params'], **dados['keys'])
