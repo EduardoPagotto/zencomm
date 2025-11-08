@@ -7,6 +7,7 @@ Update on 20251108
 
 import asyncio
 import json
+from typing import Any
 from urllib.parse import urlparse
 
 from zen.asynchronous.rpc.ProxyObject import ProxyObject
@@ -30,7 +31,7 @@ class ConnectionRemote(ConnectionControl):
     async def exec(self, input_rpc : dict, *args, **kargs) -> dict:
 
         timeout = 60
-        parsed_url = urlparse(self.__addr)
+        parsed_url = urlparse(self.getUrl())
 
         result : dict = {}
 
@@ -82,11 +83,11 @@ class ClientRCP(object):
     def __init__(self, addr) -> None:
         self.comm = ConnectionRemote(addr)
 
-    async def __rpc(self):
+    def __rpc(self) -> Any:
         return ProxyObject(self.comm)
 
     async def teste(self, nome : str) -> str:
-        return await self.__rpc().teste(nome)
+        return await self.__rpc().teste(nome) # pyright: ignore[reportAttributeAccessIssue]
 
 
 async def main():
