@@ -154,6 +154,24 @@
 				"args": []
 			},
 			{
+				"name": "AsyncServerRPC",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/async_server_rpc.py",
+				"console": "integratedTerminal",
+				"args": [],
+				"justMyCode": false
+			},
+			{
+				"name": "AsyncClientRPC",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/async_client_rpc.py",
+				"console": "integratedTerminal",
+				"args": [],
+				"justMyCode": false
+			},
+			{
 				"name": "SyncServer",
 				"type": "debugpy",
 				"request": "launch",

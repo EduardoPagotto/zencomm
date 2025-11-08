@@ -6,12 +6,14 @@ Update on 20251107
 
 from socket import socket
 from typing import Tuple
+
+from zen import __version__ as VERSION
 from zen.header import ProtocolCode, Header, HEADER_SIZE, BLOCK_SIZE
 
 class Protocol(object):
     def __init__(self, sock : socket):
         self.sock = sock
-        self.version = '0.0.1'
+        self.version = VERSION
         self.peer_version = ''
 
     def __sendBlocks(self, _buffer : bytes) -> int:

@@ -34,7 +34,7 @@ async def main():
 
                 await p.sendString(ProtocolCode.COMMAND, 'cliente envia: teste 123....')
                 c, m = await p.receiveString()
-                logger.info(f'Retorno servidor: {m}')
+                await logger.info(f'Retorno servidor: {m}')
 
                 #await p.sendString(ProtocolCode.COMMAND, 'MSG FINAL!!!!!!!!!!!')
                 await asyncio.sleep(30)
