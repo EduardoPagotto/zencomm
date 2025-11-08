@@ -1,13 +1,11 @@
 '''
 Created on 20190824
-Update on 20220917
+Update on 20251108
 @author: Eduardo Pagotto
 '''
 
 import socket
 import json
-
-#import threading
 
 from zen import ExceptZen, __json_rpc_version__ as json_rpc_version
 
