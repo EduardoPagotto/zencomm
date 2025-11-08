@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20170119
-Update on 20220921
+Update on 20251108
 @author: Eduardo Pagotto
 '''
 
@@ -33,7 +33,7 @@ def connection(sock, addr, stop_event):
     protocol = None
     try:
         protocol = Protocol(sock)
-        protocol.sock.settimeout(10)
+        protocol.sock.settimeout(2)
 
     except Exception as exp:
         log.exception('falha na parametrizacao da conexao: {0}'.format(str(exp)))
@@ -42,29 +42,17 @@ def connection(sock, addr, stop_event):
     while not stop_event.is_set():
         try:
             idRec, msg = protocol.receiveString()
-            if idRec is ProtocolCode.COMMAND:
-
-                # comando_str = msg.replace("'", "\"")
-                # comando_dic = json.loads(comando_str)
-                # comando = comando_dic['comando']
+            if idRec == ProtocolCode.COMMAND:
 
                 log.debug('Comando Recebido:{0}'.format(msg))
+                protocol.sendString(ProtocolCode.RESULT, 'echo: {0}'.format(msg))
 
-                if msg == 'ola 123':
-                    protocol.sendString(ProtocolCode.RESULT, 'echo: {0}'.format(msg))
-                else:
-                    protocol.sendString(ProtocolCode.RESULT, 'teste 2')
-
-        # except ExceptionZeroErro as exp_erro:
-        #     log.warning('recevice Erro: {0}'.format(str(exp_erro)))
-        #     protocol.sendString(ProtocolCode.RESULT, 'recived error from server')
-
-        # except ExceptionZeroClose as exp_close:
-        #     log.debug('receive Close: {0}'.format(str(exp_close)))
-        #     break
+            elif idRec == ProtocolCode.CLOSE:
+                log.debug(f"close recebido: {msg}")
+                break
 
         except timeout:
-            log.debug('connection timeout..')
+            log.debug('timeout receive')
 
         except Exception as exp:
             log.error('error: {0}'.format(str(exp)))
@@ -77,7 +65,7 @@ def main():
 
     url_parser = urlparse('unix:///tmp/teste0.sock')
 
-    sock = socket_server(url_parser, 300.0, 15)
+    sock = socket_server(url_parser, 10.0, 15) # to aqui é de espera de conexao
 
     killer = GracefulKiller()
 
@@ -88,15 +76,16 @@ def main():
     log.debug('server timeout: %s', str(sock.gettimeout()))
 
     service = ServiceServer(sock, connection)
-
     service.start()
 
     cycle = 0
-    while True:
+    while not service.done:
 
         log.info('cycle:%d connections:%d', cycle, len(service.lista))
         cycle += 1
         time.sleep(5)
+
+        service.garbage()
 
         if killer.kill_now is True:
             sock.close()

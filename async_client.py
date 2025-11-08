@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20251030
-Update on 20251107
+Update on 20251108
 @author: Eduardo Pagotto
 '''
 
@@ -32,11 +32,11 @@ async def main():
 
                 p = Protocol(reader, writer)
 
-                await p.sendString(ProtocolCode.COMMAND, 'teste 123....')
+                await p.sendString(ProtocolCode.COMMAND, 'cliente envia: teste 123....')
                 c, m = await p.receiveString()
-                logger.info(f'Retorno: {m}')
+                logger.info(f'Retorno servidor: {m}')
 
-                await p.sendString(ProtocolCode.COMMAND, 'MSG FINAL!!!!!!!!!!!')
+                #await p.sendString(ProtocolCode.COMMAND, 'MSG FINAL!!!!!!!!!!!')
                 await asyncio.sleep(30)
                 await p.sendClose('fim!')
 

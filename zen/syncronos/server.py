@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20190822
-Update on 20220917
+Update on 20251108
 @author: Eduardo Pagotto
 '''
 
@@ -49,6 +49,7 @@ class ServiceServer(threading.Thread):
         """
         self.log.info('Factory connections signal to stop')
         self.stop_event.set()
+        self.sock.close()
         self.done = True
 
     def garbage(self) -> None:
