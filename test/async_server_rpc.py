@@ -7,6 +7,11 @@ Update on 20251108
 
 import asyncio
 
+import os
+import sys
+sys.path.append('.')
+sys.path.append(os.path.join(os.getcwd(), 'zen'))
+
 from zen.asynchronous import get_async_logger
 from zen.asynchronous.socket import SocketServer
 from zen.asynchronous.rpc.responser import Responser

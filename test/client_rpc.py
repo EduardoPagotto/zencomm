@@ -6,9 +6,13 @@ Update on 20251108
 '''
 
 import json
-import time
 from typing import Any
 from urllib.parse import urlparse
+
+import os
+import sys
+sys.path.append('.')
+sys.path.append(os.path.join(os.getcwd(), 'zen'))
 
 from zen.header import ProtocolCode
 from zen.syncronos import get_logger

@@ -6,13 +6,15 @@ Update on 20251108
 '''
 
 import time
-import logging
-from socket import timeout
 from urllib.parse import urlparse
+
+import os
+import sys
+sys.path.append('.')
+sys.path.append(os.path.join(os.getcwd(), 'zen'))
 
 from zen.utils import GracefulKiller
 from zen.syncronos import get_logger
-
 from zen.syncronos.rpc.responser import Responser
 from zen.syncronos.server import ServiceServer
 from zen.syncronos.socket import socket_server

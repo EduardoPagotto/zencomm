@@ -10,14 +10,17 @@ import json
 from typing import Any
 from urllib.parse import urlparse
 
-from zen.asynchronous.rpc.ProxyObject import ProxyObject
-from zen.asynchronous.rpc.ConnectionControl import ConnectionControl
+import os
+import sys
+sys.path.append('.')
+sys.path.append(os.path.join(os.getcwd(), 'zen'))
 
 from zen.header import ProtocolCode
-
 from zen.asynchronous import get_async_logger
 from zen.asynchronous.protocol import Protocol
 from zen.asynchronous.socket import socket_client
+from zen.asynchronous.rpc.ProxyObject import ProxyObject
+from zen.asynchronous.rpc.ConnectionControl import ConnectionControl
 
 URL = 'unix:///tmp/teste0.sock'
 

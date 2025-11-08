@@ -5,12 +5,16 @@ Update on 20251108
 @author: Eduardo Pagotto
 '''
 
+
 import time
 import logging
 from socket import timeout
 from urllib.parse import urlparse
 
-#import common
+import os
+import sys
+sys.path.append('.')
+sys.path.append(os.path.join(os.getcwd(), 'zen'))
 
 from zen.utils import GracefulKiller
 from zen.syncronos.protocol import Protocol, ProtocolCode
