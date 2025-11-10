@@ -7,17 +7,67 @@ Update on 20251108
 
 import asyncio
 
+import json
 import os
+import socket
 import sys
+import threading
+
 sys.path.append(os.path.join(os.getcwd(), './src'))
 
+from zencomm.asy.protocol import Protocol
+from zencomm.header import ProtocolCode
 from zencomm.asy import get_async_logger
 from zencomm.asy.socket import SocketServer
-from zencomm.asy.rpc.responser import Responser
+from zencomm.asy.rpc.RPC_Responser import RPC_Responser
 
 URL = 'unix:///tmp/teste0.sock'
 
 logger = get_async_logger('zen')
+
+class Responser(RPC_Responser):
+    def __init__(self, target: object):
+        super().__init__(target)
+
+    async def __call__(self, *args, **kargs):
+        """[execute exchange of json's messages with server RPC]
+        """
+        t_name = threading.current_thread().name
+        logger.info(f'start {t_name}')
+
+        protocol = None
+        try:
+            protocol = Protocol(args[0], args[1])
+
+        except Exception as exp:
+            await logger.critical('fail creating connection: %s', str(exp))
+            return
+
+        count_to = 0
+
+        while True:
+            try:
+                count_to = 0
+                idRec, buffer = await protocol._receiveProtocol()
+                if idRec == ProtocolCode.COMMAND:
+                    await protocol.sendString(ProtocolCode.RESULT, json.dumps(await self.encode_exec_decode(json.loads(buffer.decode('UTF-8')))))
+
+                elif idRec == ProtocolCode.CLOSE:
+                    logger.debug(f'responser receive {buffer.decode('UTF-8')}')
+                    break
+
+            except socket.timeout:
+                count_to += 1
+                logger.warning('%s TO count: %d', t_name, count_to)
+
+            except Exception as exp:
+                logger.error('%s exception error: %s', t_name, str(exp))
+                break
+
+        await protocol.close()
+
+        await logger.info(f'{t_name} finnished')
+
 
 class ServerRPC(object):
     def __init__(self, url: str):
