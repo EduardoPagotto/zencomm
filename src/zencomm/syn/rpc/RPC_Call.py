@@ -7,8 +7,8 @@ Update on 20220926
 import threading
 import random
 
-from zen import __json_rpc_version__ as json_rpc_version
-from zen import ExceptZen
+from zencomm import __json_rpc_version__ as json_rpc_version
+from zencomm import ExceptZen
 
 from .ConnectionControl import ConnectionControl
 

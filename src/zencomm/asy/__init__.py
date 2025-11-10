@@ -14,8 +14,8 @@ from pathlib import Path
 
 _glogger = None
 
-# from zen.asynchronous.protocol import Protocol
-# from zen.asynchronous.socket import socket_client, SocketServer
+# from zencomm.asy.protocol import Protocol
+# from zencomm.asy.socket import socket_client, SocketServer
 
 def get_async_logger(name: str = '') -> Logger:
 

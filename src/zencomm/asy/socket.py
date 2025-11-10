@@ -9,7 +9,7 @@ import asyncio
 import signal
 from urllib.parse import urlparse
 
-from zen.asynchronous import get_async_logger
+from zencomm.asy import get_async_logger
 
 class SocketServer(object):
     def __init__(self, url : str, func_handler):

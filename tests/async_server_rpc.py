@@ -9,12 +9,11 @@ import asyncio
 
 import os
 import sys
-sys.path.append('.')
-sys.path.append(os.path.join(os.getcwd(), 'zen'))
+sys.path.append(os.path.join(os.getcwd(), './src'))
 
-from zen.asynchronous import get_async_logger
-from zen.asynchronous.socket import SocketServer
-from zen.asynchronous.rpc.responser import Responser
+from zencomm.asy import get_async_logger
+from zencomm.asy.socket import SocketServer
+from zencomm.asy.rpc.responser import Responser
 
 URL = 'unix:///tmp/teste0.sock'
 

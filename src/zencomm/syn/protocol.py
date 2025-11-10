@@ -1,23 +1,22 @@
 '''
-Created on 20241001
-Update on 20251108
+Created on 20251107
+Update on 20251107
 @author: Eduardo Pagotto
 '''
 
+from socket import socket
 from typing import Tuple
 
-from zen import __version__ as VERSION
-from zen.header import ProtocolCode, Header, HEADER_SIZE, BLOCK_SIZE
+from zencomm import __version__ as VERSION
+from zencomm.header import ProtocolCode, Header, HEADER_SIZE, BLOCK_SIZE
 
 class Protocol(object):
-
-    def __init__(self, reader, writer):
-        self.__reader = reader
-        self.__writer = writer
+    def __init__(self, sock : socket):
+        self.sock = sock
         self.version = VERSION
         self.peer_version = ''
 
-    async def __sendBlocks(self, _buffer : bytes) -> int:
+    def __sendBlocks(self, _buffer : bytes) -> int:
 
         total_enviado : int = 0
         total_buffer :int = len(_buffer)
@@ -30,14 +29,15 @@ class Protocol(object):
             fim = total_enviado + tam
 
             sub_buffer = bytearray(_buffer[inicio:fim])
-            self.__writer.write(sub_buffer)
-            await self.__writer.drain()
+            sent = self.sock.send(sub_buffer)
+            if sent == 0:
+                raise Exception("send block fail")
 
             total_enviado = fim
 
         return total_enviado
 
-    async def __receiveBlocks(self, _tamanho : int) -> bytes:
+    def __receiveBlocks(self, _tamanho : int) -> bytes:
 
         total_recebido : int = 0
         buffer_local : bytes = bytes()
@@ -47,7 +47,8 @@ class Protocol(object):
             if tam > BLOCK_SIZE:
                 tam = BLOCK_SIZE
 
-            chunk : bytes = await self.__reader.readexactly(tam)
+            # chunk : bytes = await self.__reader.readexactly(tam)
+            chunk : bytes = self.sock.recv(tam)
 
             if chunk == b'':
                 raise Exception("receive empty block")
@@ -58,28 +59,27 @@ class Protocol(object):
 
         return buffer_local
 
-    async def _sendProtocol(self, _id : ProtocolCode, _buffer : bytes) -> int:
+    def _sendProtocol(self, _id : ProtocolCode, _buffer : bytes) -> int:
 
         header = Header(id=_id)
+        return self.__sendBlocks(header.encode(_buffer))
 
-        return await self.__sendBlocks(header.encode(_buffer))
-
-    async def _receiveProtocol(self) -> Tuple[ProtocolCode, bytes]:
+    def _receiveProtocol(self) -> Tuple[ProtocolCode, bytes]:
 
         header = Header()
 
-        header.decode_h(await self.__receiveBlocks(HEADER_SIZE))
+        header.decode_h(self.__receiveBlocks(HEADER_SIZE))
 
-        binario = header.decode_d(await self.__receiveBlocks(header.size_zip))
+        binario = header.decode_d(self.__receiveBlocks(header.size_zip))
 
         if header.id == ProtocolCode.OPEN:
             self.peer_version = binario.decode('UTF-8')
             #self.log.debug('handshake with host:%s', msg)
-            await self.sendString(ProtocolCode.RESULT, self.version)
+            self.sendString(ProtocolCode.RESULT, self.version)
 
         elif header.id == ProtocolCode.CLOSE:
             #self.log.debug('closure receved:%s', binario.decode('UTF-8'))
-            await self.close()
+            self.close()
             #raise Exception('close received:{0}'.format(binario.decode('UTF-8')))
 
         elif header.id == ProtocolCode.ERRO:
@@ -87,42 +87,41 @@ class Protocol(object):
 
         return ProtocolCode(header.id), binario
 
-    async def close(self):
-        self.__writer.close()
-        await self.__writer.wait_closed()
+    def close(self):
+        self.sock.close()
 
-    async def sendString(self, _id : ProtocolCode, _texto : str) -> int:
+    def sendString(self, _id : ProtocolCode, _texto : str) -> int:
 
-        return await self._sendProtocol(_id, _texto.encode('UTF-8'))
+        return self._sendProtocol(_id, _texto.encode('UTF-8'))
 
-    async def receiveString(self) -> Tuple[ProtocolCode, str]:
+    def receiveString(self) -> Tuple[ProtocolCode, str]:
 
-        buffer = await self._receiveProtocol()
+        buffer = self._receiveProtocol()
         return(buffer[0], buffer[1].decode('UTF-8'))
 
-    async def sendClose(self, _texto : str) -> None:
+    def sendClose(self, _texto : str) -> None:
 
-        await self.sendString(ProtocolCode.CLOSE, _texto)
-        await self.close()
+        self.sendString(ProtocolCode.CLOSE, _texto)
+        self.close()
 
-    async def handShake(self) -> str:
+    def handShake(self) -> str:
 
-        await self.sendString(ProtocolCode.OPEN, self.version)
-        idRecive, msg = await self.receiveString()
+        self.sendString(ProtocolCode.OPEN, self.version)
+        idRecive, msg = self.receiveString()
         if idRecive is ProtocolCode.RESULT:
             #self.log.info('handshake with server: %s', msg)
             return msg
 
         raise Exception('Fail to Handshake')
 
-    async def exchange(self, input : str) -> str:
+    def exchange(self, input : str) -> str:
 
-        await self.sendString(ProtocolCode.COMMAND, input)
-        id, msg = await self.receiveString()
+        self.sendString(ProtocolCode.COMMAND, input)
+        id, msg = self.receiveString()
         if id == ProtocolCode.RESULT:
             return msg
 
         raise Exception('Resposta invalida: ({0} : {1})'.format(id, msg))
 
-    async def sendErro(self, msg : str) -> int:
-        return await self.sendString(ProtocolCode.ERRO, msg)
+    def sendErro(self, msg : str) -> int:
+        return self.sendString(ProtocolCode.ERRO, msg)

@@ -10,13 +10,12 @@ from urllib.parse import urlparse
 
 import os
 import sys
-sys.path.append('.')
-sys.path.append(os.path.join(os.getcwd(), 'zen'))
+sys.path.append(os.path.join(os.getcwd(), './src'))
 
-from zen.header import ProtocolCode
-from zen.asynchronous import get_async_logger
-from zen.asynchronous.protocol import Protocol
-from zen.asynchronous.socket import socket_client
+from zencomm.header import ProtocolCode
+from zencomm.asy import get_async_logger
+from zencomm.asy.protocol import Protocol
+from zencomm.asy.socket import socket_client
 
 URL = 'unix:///tmp/teste0.sock'
 

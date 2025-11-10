@@ -107,9 +107,9 @@
 		},
 		//
 		// PYTHON extra libs
-		// "python.analysis.extraPaths": [
-		// 	"./app/"
-		// ],
+		"python.analysis.extraPaths": [
+			"./src/"
+		],
 	},
 	"launch": {
 		"version": "0.2.0",

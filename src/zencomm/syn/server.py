@@ -37,7 +37,7 @@ class ServiceServer(threading.Thread):
         self.done : bool = False
         self.stop_event = threading.Event()
 
-        self.log = logging.getLogger('zen.server')
+        self.log = logging.getLogger('zencomm.server')
 
         self.total = 0
         self.anterior = 0

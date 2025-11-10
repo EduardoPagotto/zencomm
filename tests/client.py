@@ -11,12 +11,11 @@ from urllib.parse import urlparse
 
 import os
 import sys
-sys.path.append('.')
-sys.path.append(os.path.join(os.getcwd(), 'zen'))
+sys.path.append(os.path.join(os.getcwd(), './src'))
 
-from zen.header import ProtocolCode
-from zen.syncronos.protocol import Protocol
-from zen.syncronos.socket import socket_client
+from zencomm.header import ProtocolCode
+from zencomm.syn.protocol import Protocol
+from zencomm.syn.socket import socket_client
 
 
 logging.basicConfig(

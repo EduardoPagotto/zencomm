@@ -8,11 +8,11 @@ import socket
 import json
 import threading
 
-from zen import ExceptZen, __json_rpc_version__ as json_rpc_version
+from zencomm import ExceptZen, __json_rpc_version__ as json_rpc_version
 
-from zen.asynchronous import get_async_logger
-from zen.asynchronous.protocol import Protocol
-from zen.header import ProtocolCode
+from zencomm.asy import get_async_logger
+from zencomm.asy.protocol import Protocol
+from zencomm.header import ProtocolCode
 
 class Responser(object):
     """[Connection thread with server RPC ]

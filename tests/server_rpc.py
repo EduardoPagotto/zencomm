@@ -10,14 +10,13 @@ from urllib.parse import urlparse
 
 import os
 import sys
-sys.path.append('.')
-sys.path.append(os.path.join(os.getcwd(), 'zen'))
+sys.path.append(os.path.join(os.getcwd(), './src'))
 
-from zen.utils import GracefulKiller
-from zen.syncronos import get_logger
-from zen.syncronos.rpc.responser import Responser
-from zen.syncronos.server import ServiceServer
-from zen.syncronos.socket import socket_server
+from zencomm.utils import GracefulKiller
+from zencomm.syn import get_logger
+from zencomm.syn.rpc.responser import Responser
+from zencomm.syn.server import ServiceServer
+from zencomm.syn.socket import socket_server
 
 logger = get_logger('zen')
 

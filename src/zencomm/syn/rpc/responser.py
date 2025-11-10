@@ -8,11 +8,11 @@ import socket
 import json
 import threading
 
-from zen import ExceptZen, __json_rpc_version__ as json_rpc_version
+from zencomm import ExceptZen, __json_rpc_version__ as json_rpc_version
 
-from zen.syncronos import get_logger
-from zen.syncronos.protocol import Protocol
-from zen.header import ProtocolCode
+from zencomm.syn import get_logger
+from zencomm.syn.protocol import Protocol
+from zencomm.header import ProtocolCode
 
 class Responser(object):
     """[Connection thread with server RPC ]
