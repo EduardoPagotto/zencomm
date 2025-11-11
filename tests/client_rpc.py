@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20170119
-Update on 20251108
+Update on 20251111
 @author: Eduardo Pagotto
 '''
 
@@ -9,16 +9,16 @@ import json
 from typing import Any
 from urllib.parse import urlparse
 
+from sjsonrpc.syn import ConnectionControl, ProxyObject
+
 import os
 import sys
-sys.path.append(os.path.join(os.getcwd(), './src'))
+sys.path.append(os.path.join(os.getcwd(), '.'))
 
 from zencomm.header import ProtocolCode
 from zencomm.syn import get_logger
 from zencomm.syn.protocol import Protocol
 from zencomm.syn.socket import socket_client
-from zencomm.syn.rpc.ConnectionControl import ConnectionControl
-from zencomm.syn.rpc.ProxyObject import ProxyObject
 
 logger = get_logger('zen_client')
 

@@ -1,6 +1,6 @@
 '''
 Created on 20241001
-Update on 20251107
+Update on 20251111
 @author: Eduardo Pagotto
 '''
 
@@ -13,9 +13,6 @@ from aiologger.levels import LogLevel
 from pathlib import Path
 
 _glogger = None
-
-# from zencomm.asy.protocol import Protocol
-# from zencomm.asy.socket import socket_client, SocketServer
 
 def get_async_logger(name: str = '') -> Logger:
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20170119
-Update on 20251108
+Update on 20251111
 @author: Eduardo Pagotto
 '''
 
@@ -11,15 +11,16 @@ import threading
 import time
 from urllib.parse import urlparse
 
+from sjsonrpc.syn import RPC_Responser
+
 import os
 import sys
-sys.path.append(os.path.join(os.getcwd(), './src'))
+sys.path.append(os.path.join(os.getcwd(), '.'))
 
 from zencomm.header import ProtocolCode
 from zencomm.syn.protocol import Protocol
 from zencomm.utils import GracefulKiller
 from zencomm.syn import get_logger
-from zencomm.syn.rpc.RPC_Responser import RPC_Responser
 from zencomm.syn.server import ServiceServer
 from zencomm.syn.socket import socket_server
 

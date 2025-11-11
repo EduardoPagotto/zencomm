@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 '''
 Created on 20241001
-Update on 20251108
+Update on 20251111
 @author: Eduardo Pagotto
 '''
 
 import asyncio
-
 import json
 import os
 import socket
 import sys
 import threading
 
-sys.path.append(os.path.join(os.getcwd(), './src'))
+from sjsonrpc.asy import RPC_Responser
+
+sys.path.append(os.path.join(os.getcwd(), '.'))
 
 from zencomm.asy.protocol import Protocol
 from zencomm.header import ProtocolCode
 from zencomm.asy import get_async_logger
 from zencomm.asy.socket import SocketServer
-from zencomm.asy.rpc.RPC_Responser import RPC_Responser
 
 URL = 'unix:///tmp/teste0.sock'
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20251030
-Update on 20251108
+Update on 20251111
 @author: Eduardo Pagotto
 '''
 
@@ -10,21 +10,20 @@ import json
 from typing import Any
 from urllib.parse import urlparse
 
+from sjsonrpc.asy import ProxyObject, ConnectionControl
+
 import os
 import sys
-sys.path.append(os.path.join(os.getcwd(), './src'))
+sys.path.append(os.path.join(os.getcwd(), '.'))
 
 from zencomm.header import ProtocolCode
 from zencomm.asy import get_async_logger
 from zencomm.asy.protocol import Protocol
 from zencomm.asy.socket import socket_client
-from zencomm.asy.rpc.ProxyObject import ProxyObject
-from zencomm.asy.rpc.ConnectionControl import ConnectionControl
 
 URL = 'unix:///tmp/teste0.sock'
 
 logger = get_async_logger('zen')
-
 
 class ConnectionRemote(ConnectionControl):
     def __init__(self, url):
