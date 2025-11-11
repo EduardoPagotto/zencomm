@@ -6,8 +6,10 @@ Update on 20251108
 
 import logging
 import sys
-
 from pathlib import Path
+
+from zencomm.syn.socket import socket_client, socket_server
+from zencomm.syn.protocol import Protocol
 
 _gslogger = None
 
