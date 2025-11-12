@@ -23,8 +23,6 @@ def read(fname):
     with open(os.path.join(os.path.dirname(__file__), fname), "r", encoding="utf-8") as f:
         return f.read()
 
-    #return codecs.open(os.path.join(os.path.dirname(__file__), fname)).read()
-
 setup(
     name="zencomm",
     version=VERSION,
