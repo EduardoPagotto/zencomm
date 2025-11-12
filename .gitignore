@@ -22,3 +22,5 @@ __pypackages__/
 *.db
 log/
 deploy/
+dist/
+*.egg-info/

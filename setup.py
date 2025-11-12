@@ -6,7 +6,7 @@ Update on 20251111
 '''
 
 import os
-import codecs
+#import codecs
 from setuptools import setup, find_packages
 
 from zencomm import __version__ as VERSION
@@ -20,7 +20,10 @@ PACKAGE = "zencomm"
 # https://pypi.org/classifiers/
 
 def read(fname):
-    return codecs.open(os.path.join(os.path.dirname(__file__), fname)).read()
+    with open(os.path.join(os.path.dirname(__file__), fname), "r", encoding="utf-8") as f:
+        return f.read()
+
+    #return codecs.open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
     name="zencomm",
@@ -42,7 +45,6 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries",
-        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent"
     ],

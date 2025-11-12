@@ -4,7 +4,7 @@ Update on 20251111
 @author: Eduardo Pagotto
 '''
 
-__version__ : str = "1.2.3"
+__version__ : str = "2.0.0"
 
 from zencomm.header import ProtocolCode
 from zencomm.utils import GracefulKiller
