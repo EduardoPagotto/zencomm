@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 '''
 Created on 20170119
-Update on 20251111
+Update on 20251112
 @author: Eduardo Pagotto
 '''
-
 
 import time
 import logging
@@ -17,18 +16,14 @@ sys.path.append(os.path.join(os.getcwd(), '.'))
 
 from zencomm import ProtocolCode, GracefulKiller
 from zencomm.syn import Protocol, ServiceServer, socket_server
+from zencomm import setup_queue_logging
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(name)-12s %(levelname)-8s %(threadName)-16s %(funcName)-20s %(message)s',
-    datefmt='%H:%M:%S',
-)
+logger_listern = setup_queue_logging('./log/server.log')
+logger = logging.getLogger('server')
 
 def connection(sock, addr, stop_event):
 
-    log = logging.getLogger('Zero.Con')
-
-    log.info('connection stated')
+    logger.info('connection stated')
 
     #done = kwargs['done']
     protocol = None
@@ -37,7 +32,7 @@ def connection(sock, addr, stop_event):
         protocol.sock.settimeout(2)
 
     except Exception as exp:
-        log.exception('falha na parametrizacao da conexao: {0}'.format(str(exp)))
+        logger.exception('falha na parametrizacao da conexao: {0}'.format(str(exp)))
         return
 
     while not stop_event.is_set():
@@ -45,22 +40,22 @@ def connection(sock, addr, stop_event):
             idRec, msg = protocol.receiveString()
             if idRec == ProtocolCode.COMMAND:
 
-                log.debug('Comando Recebido:{0}'.format(msg))
+                logger.debug('Comando Recebido:{0}'.format(msg))
                 protocol.sendString(ProtocolCode.RESULT, 'echo: {0}'.format(msg))
 
             elif idRec == ProtocolCode.CLOSE:
-                log.debug(f"close recebido: {msg}")
+                logger.debug(f"close recebido: {msg}")
                 break
 
         except timeout:
-            log.debug('timeout receive')
+            logger.debug('timeout receive')
 
         except Exception as exp:
-            log.error('error: {0}'.format(str(exp)))
+            logger.error('error: {0}'.format(str(exp)))
             break
 
 
-    log.info('connection finished')
+    logger.info('connection finished')
 
 def main():
 
@@ -70,11 +65,7 @@ def main():
 
     killer = GracefulKiller()
 
-    log = logging.getLogger('Server')
-    logging.getLogger('Zero').setLevel(logging.INFO)
-
-
-    log.debug('server timeout: %s', str(sock.gettimeout()))
+    logger.debug('server timeout: %s', str(sock.gettimeout()))
 
     service = ServiceServer(sock, connection)
     service.start()
@@ -82,7 +73,7 @@ def main():
     cycle = 0
     while not service.done:
 
-        log.info('cycle:%d connections:%d', cycle, len(service.lista))
+        logger.info('cycle:%d connections:%d', cycle, len(service.lista))
         cycle += 1
         time.sleep(5)
 

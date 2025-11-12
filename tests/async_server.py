@@ -1,22 +1,21 @@
 #!/usr/bin/env python3
 '''
 Created on 20241001
-Update on 20251111
+Update on 20251112
 @author: Eduardo Pagotto
 '''
 
 import asyncio
-
+import logging
 import os
 import sys
 sys.path.append(os.path.join(os.getcwd(), '.'))
 
-from zencomm.header import ProtocolCode
-from zencomm.asy import get_async_logger, Protocol, SocketServer
+from zencomm import ProtocolCode, setup_queue_logging
+from zencomm.asy import Protocol, SocketServer
 
-URL = 'unix:///tmp/teste0.sock'
-
-logger = get_async_logger('zen')
+logger_listern = setup_queue_logging('./log/async_server.log')
+logger = logging.getLogger('async_server')
 
 async def handle_client(reader, writer):
 
@@ -31,11 +30,11 @@ async def handle_client(reader, writer):
 
             code, msg = await p.receiveString()
             if code == ProtocolCode.CLOSE:
-                await logger.info(f"close recebido: {msg}")
+                logger.info(f"close recebido: {msg}")
                 is_online = False
 
             elif code == ProtocolCode.COMMAND:
-                await logger.info(f"msg recebida: {msg}")
+                logger.info(f"msg recebida: {msg}")
                 await p.sendString(ProtocolCode.RESULT, "Recebido OK!!!")
 
             else:
@@ -48,14 +47,12 @@ async def handle_client(reader, writer):
 
 
 async def main():
-    await logger.info("server start.")
+    logger.info("server start.")
 
-    server = SocketServer(URL,handle_client)
-
+    server = SocketServer('unix:///tmp/teste0.sock', handle_client)
     await server.execute()
 
-    await logger.info("server stop.")
-    await logger.shutdown()
+    logger.info("server stop.")
 
 if __name__ == "__main__":
     asyncio.run(main())

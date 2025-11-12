@@ -1,32 +1,31 @@
 #!/usr/bin/env python3
 '''
 Created on 20251030
-Update on 20251111
+Update on 20251112
 @author: Eduardo Pagotto
 '''
 
-import asyncio
-from urllib.parse import urlparse
-
 import os
 import sys
+import asyncio
+import logging
+from urllib.parse import urlparse
+
 sys.path.append(os.path.join(os.getcwd(), '.'))
 
 from zencomm.header import ProtocolCode
-from zencomm.asy.logger import get_async_logger
+from zencomm.logger import setup_queue_logging
 from zencomm.asy import Protocol, socket_client
 
-URL = 'unix:///tmp/teste0.sock'
-
-logger = get_async_logger('zen')
-
+logger_listern = setup_queue_logging('./log/async_client.log')
+logger = logging.getLogger('async_server')
 
 async def main():
 
-    await logger.info("client start.")
+    logger.info("client start.")
 
     timeout = 60
-    parsed_url = urlparse(URL)
+    parsed_url = urlparse('unix:///tmp/teste0.sock')
 
     try:
         reader, writer = await socket_client(parsed_url, timeout)
@@ -36,7 +35,7 @@ async def main():
 
                 await p.sendString(ProtocolCode.COMMAND, 'cliente envia: teste 123....')
                 c, m = await p.receiveString()
-                await logger.info(f'Retorno servidor: {m}')
+                logger.info(f'Retorno servidor: {m}')
 
                 #await p.sendString(ProtocolCode.COMMAND, 'MSG FINAL!!!!!!!!!!!')
                 await asyncio.sleep(30)
@@ -64,9 +63,7 @@ async def main():
         logger.error(f"An unexpected error occurred: {str(e)}")
 
     finally:
-        await logger.info("client stop.")
-
-    await logger.shutdown()
+        logger.info("client stop.")
 
 
 if __name__ == "__main__":
@@ -74,6 +71,6 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("Client shutting down gracefully...")
+        logger.info("Client shutting down gracefully...")
     except asyncio.CancelledError:
-        print("Client task cancelled gracefully...")
+        logger.info("Client task cancelled gracefully...")

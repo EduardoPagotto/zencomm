@@ -1,11 +1,12 @@
 '''
 Created on 20251107
-Update on 20251107
+Update on 20251112
 @author: Eduardo Pagotto
 '''
 
 import os
 
+from zencomm import ExceptZen
 from socket import socket, AF_INET, AF_UNIX, SOCK_STREAM
 from urllib.parse import urlparse
 
@@ -36,7 +37,7 @@ def socket_server(parsed_url: urlparse, timeout : float, listen_val: int) -> soc
         soc.bind(path)
 
     else:
-        raise Exception(f"scheme {parsed_url.scheme} invalid")
+        raise ExceptZen(f"scheme {parsed_url.scheme} invalid")
 
     soc.listen(listen_val)
 
@@ -71,6 +72,6 @@ def socket_client(parsed_url : urlparse, timeout : int): # pyright: ignore[repor
         soc.connect(path)
 
     else:
-        raise Exception(f"scheme {parsed_url.scheme} invalid")
+        raise ExceptZen(f"scheme {parsed_url.scheme} invalid")
 
     return soc

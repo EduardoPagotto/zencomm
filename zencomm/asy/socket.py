@@ -1,21 +1,20 @@
 '''
 Created on 20241001
-Update on 20251111
+Update on 20251112
 @author: Eduardo Pagotto
 '''
 
+import logging
 import os
 import asyncio
 import signal
 from urllib.parse import urlparse
 
-from zencomm.asy.logger import get_async_logger
-
 class SocketServer(object):
     def __init__(self, url : str, func_handler):
         self.parsed_url = urlparse(url)
         self.func_handler = func_handler
-        self.log = get_async_logger()
+        self.log = logging.getLogger(__name__)
 
     async def __main_tcp(self):
         """
@@ -27,7 +26,7 @@ class SocketServer(object):
         server = await asyncio.start_server(self.func_handler, host, port)
         addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
 
-        await self.log.info(f"Serving on {addrs}")
+        self.log.info(f"Serving on {addrs}")
 
         async with server:
             await server.serve_forever()
@@ -44,7 +43,7 @@ class SocketServer(object):
         server = await asyncio.start_unix_server(self.func_handler, path)
         async with server:
 
-            await self.log.info(f"Serving on {self.parsed_url.geturl()}")
+            self.log.info(f"Serving on {self.parsed_url.geturl()}")
 
             #await server.serve_forever()
             # Create a task for serve_forever to allow it to be cancelled
@@ -55,7 +54,7 @@ class SocketServer(object):
             stop_event = asyncio.Event()
 
             def signal_handler():
-                #await self.log.warning("Shutdown signal received...")
+                #self.log.warning("Shutdown signal received...")
                 stop_event.set()
 
             loop.add_signal_handler(signal.SIGINT, signal_handler)
@@ -83,7 +82,7 @@ class SocketServer(object):
             return await self.__main_unix()
 
         else:
-            await self.log.info("Invalid SERVER_TYPE. Choose 'TCP' or 'UNIX'.")
+            self.log.info("Invalid SERVER_TYPE. Choose 'TCP' or 'UNIX'.")
 
 
 async def socket_client(parsed_url : urlparse, timeout : int) -> tuple[asyncio.StreamReader, asyncio.StreamWriter]: # pyright: ignore[reportGeneralTypeIssues]

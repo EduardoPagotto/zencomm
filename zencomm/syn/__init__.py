@@ -7,4 +7,3 @@ Update on 20251111
 from zencomm.syn.socket import socket_client, socket_server
 from zencomm.syn.protocol import Protocol
 from zencomm.syn.server import ServiceServer
-from zencomm.syn.logger import get_logger

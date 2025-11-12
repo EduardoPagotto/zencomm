@@ -7,8 +7,5 @@ Update on 20251111
 __version__ : str = "2.0.0"
 
 from zencomm.header import ProtocolCode
-from zencomm.utils import GracefulKiller
-
-class ExceptZen(Exception):
-    def __init__(self, *args, **kwargs):
-        Exception.__init__(self, *args, **kwargs)
+from zencomm.utils import GracefulKiller,Singleton, ExceptZen
+from zencomm.logger import setup_queue_logging
