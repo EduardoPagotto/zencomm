@@ -1,5 +1,12 @@
-# Zen Async
-Async Protocol TCP and Unix Domain Socket
+# ZenComm
+Sync/Async binary socket protocol, works with Unix and TCP/IP
 
+### Examples
 
-pip3 install git+https://github.com/EduardoPagotto/sJsonRpc
+```bash
+./tests
+ ├── async_client.py # async client example
+ ├── async_server.py # async server example
+ ├── client.py       # sync client example
+ └── server.py       # sunc server example
+```
