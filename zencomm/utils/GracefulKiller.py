@@ -5,7 +5,7 @@ Update on 20210212
 '''
 
 import signal
-from .Singleton import Singleton
+from zencomm.utils.Singleton import Singleton
 
 class GracefulKiller(metaclass=Singleton):
     def __init__(self):

@@ -4,4 +4,4 @@ Update on 20251107
 @author: Eduardo Pagotto
 '''
 
-from .GracefulKiller import GracefulKiller
+from zencomm.utils.GracefulKiller import GracefulKiller

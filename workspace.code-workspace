@@ -107,9 +107,9 @@
 		},
 		//
 		// PYTHON extra libs
-		"python.analysis.extraPaths": [
-			"./src/"
-		],
+		// "python.analysis.extraPaths": [
+		// 	"./src/"
+		// ],
 	},
 	"launch": {
 		"version": "0.2.0",
@@ -125,7 +125,7 @@
 				"name": "Client",
 				"type": "debugpy",
 				"request": "launch",
-				"program": "${workspaceFolder}/text/client.py",
+				"program": "${workspaceFolder}/tests/client.py",
 				"console": "integratedTerminal",
 				"args": []
 			},
@@ -133,7 +133,7 @@
 				"name": "Server",
 				"type": "debugpy",
 				"request": "launch",
-				"program": "${workspaceFolder}/test/server.py",
+				"program": "${workspaceFolder}/tests/server.py",
 				"console": "integratedTerminal",
 				"args": []
 			},
@@ -141,7 +141,7 @@
 				"name": "AsyncServer",
 				"type": "debugpy",
 				"request": "launch",
-				"program": "${workspaceFolder}/async_server.py",
+				"program": "${workspaceFolder}/tests/async_server.py",
 				"console": "integratedTerminal",
 				"args": []
 			},
@@ -149,33 +149,7 @@
 				"name": "AsyncClient",
 				"type": "debugpy",
 				"request": "launch",
-				"program": "${workspaceFolder}/async_client.py",
-				"console": "integratedTerminal",
-				"args": []
-			},
-			{
-				"name": "AsyncServerRPC",
-				"type": "debugpy",
-				"request": "launch",
-				"program": "${workspaceFolder}/async_server_rpc.py",
-				"console": "integratedTerminal",
-				"args": [],
-				"justMyCode": false
-			},
-			{
-				"name": "AsyncClientRPC",
-				"type": "debugpy",
-				"request": "launch",
-				"program": "${workspaceFolder}/async_client_rpc.py",
-				"console": "integratedTerminal",
-				"args": [],
-				"justMyCode": false
-			},
-			{
-				"name": "SyncServer",
-				"type": "debugpy",
-				"request": "launch",
-				"program": "${workspaceFolder}/server.py",
+				"program": "${workspaceFolder}/tests/async_client.py",
 				"console": "integratedTerminal",
 				"args": []
 			}

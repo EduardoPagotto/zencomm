@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20241001
-Update on 20251031
+Update on 20251111
 @author: Eduardo Pagotto
 '''
 
@@ -9,12 +9,10 @@ import asyncio
 
 import os
 import sys
-sys.path.append(os.path.join(os.getcwd(), './src'))
+sys.path.append(os.path.join(os.getcwd(), '.'))
 
 from zencomm.header import ProtocolCode
-from zencomm.asy import get_async_logger
-from zencomm.asy.protocol import Protocol
-from zencomm.asy.socket import SocketServer
+from zencomm.asy import get_async_logger, Protocol, SocketServer
 
 URL = 'unix:///tmp/teste0.sock'
 

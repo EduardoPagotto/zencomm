@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20170119
-Update on 20251108
+Update on 20251111
 @author: Eduardo Pagotto
 '''
 
@@ -13,12 +13,10 @@ from urllib.parse import urlparse
 
 import os
 import sys
-sys.path.append(os.path.join(os.getcwd(), './src'))
+sys.path.append(os.path.join(os.getcwd(), '.'))
 
-from zencomm.utils import GracefulKiller
-from zencomm.syn.protocol import Protocol, ProtocolCode
-from zencomm.syn.server import ServiceServer
-from zencomm.syn.socket import socket_server
+from zencomm import ProtocolCode, GracefulKiller
+from zencomm.syn import Protocol, ServiceServer, socket_server
 
 logging.basicConfig(
     level=logging.DEBUG,

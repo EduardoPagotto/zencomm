@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20251030
-Update on 20251108
+Update on 20251111
 @author: Eduardo Pagotto
 '''
 
@@ -10,12 +10,11 @@ from urllib.parse import urlparse
 
 import os
 import sys
-sys.path.append(os.path.join(os.getcwd(), './src'))
+sys.path.append(os.path.join(os.getcwd(), '.'))
 
 from zencomm.header import ProtocolCode
-from zencomm.asy import get_async_logger
-from zencomm.asy.protocol import Protocol
-from zencomm.asy.socket import socket_client
+from zencomm.asy.logger import get_async_logger
+from zencomm.asy import Protocol, socket_client
 
 URL = 'unix:///tmp/teste0.sock'
 
