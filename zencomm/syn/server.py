@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 '''
 Created on 20190822
-Update on 20251108
+Update on 20251111
 @author: Eduardo Pagotto
 '''
 
-#import time
-#import socket
 from socket import socket, timeout
 import logging
 import threading

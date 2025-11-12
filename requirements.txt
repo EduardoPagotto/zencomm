@@ -1,4 +1,5 @@
 pip===25.3
-aiofiles===25.1.0
+setuptools==80.9.0
+typing_extensions==4.15.0
+wheel==0.45.1
 aiologger===0.7.0
-python-json-logger===4.0.0

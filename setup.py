@@ -49,6 +49,4 @@ setup(
     install_requires=['setuptools',
                       'typing_extensions',
                       'wheel',
-                      'aiofiles',
-                      'aiologger',
-                      'python-json-logger'])
+                      'aiologger'])
