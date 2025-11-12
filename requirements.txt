@@ -2,4 +2,3 @@ pip===25.3
 setuptools==80.9.0
 typing_extensions==4.15.0
 wheel==0.45.1
-aiologger===0.7.0
