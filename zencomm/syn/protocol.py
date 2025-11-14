@@ -1,6 +1,6 @@
 '''
 Created on 20251107
-Update on 20251111
+Update on 20251114
 @author: Eduardo Pagotto
 '''
 
@@ -32,7 +32,7 @@ class Protocol(object):
             sub_buffer = bytearray(_buffer[inicio:fim])
             sent = self.sock.send(sub_buffer)
             if sent == 0:
-                raise Exception("send block fail")
+                raise ExceptZen("send block fail")
 
             total_enviado = fim
 
@@ -52,7 +52,7 @@ class Protocol(object):
             chunk : bytes = self.sock.recv(tam)
 
             if chunk == b'':
-                raise Exception("receive empty block")
+                raise ExceptZen("receive empty block")
 
             buffer_local += chunk
 
@@ -81,10 +81,10 @@ class Protocol(object):
         elif header.id == ProtocolCode.CLOSE:
             #self.log.debug('closure receved:%s', binario.decode('UTF-8'))
             self.close()
-            #raise Exception('close received:{0}'.format(binario.decode('UTF-8')))
+            #raise ExceptZen('close received:{0}'.format(binario.decode('UTF-8')))
 
         elif header.id == ProtocolCode.ERRO:
-            raise Exception('{0}'.format(binario.decode('UTF-8')))
+            raise ExceptZen('{0}'.format(binario.decode('UTF-8')))
 
         return ProtocolCode(header.id), binario
 
@@ -113,7 +113,7 @@ class Protocol(object):
             #self.log.info('handshake with server: %s', msg)
             return msg
 
-        raise Exception('Fail to Handshake')
+        raise ExceptZen('Fail to Handshake')
 
     def exchange(self, input : str) -> str:
 
@@ -122,7 +122,7 @@ class Protocol(object):
         if id == ProtocolCode.RESULT:
             return msg
 
-        raise Exception('Resposta invalida: ({0} : {1})'.format(id, msg))
+        raise ExceptZen('Resposta invalida: ({0} : {1})'.format(id, msg))
 
     def sendErro(self, msg : str) -> int:
         return self.sendString(ProtocolCode.ERRO, msg)
@@ -132,9 +132,9 @@ class Protocol(object):
         Args:
             buffer (bytes): [buffer of data]
         Raises:
-            ExceptionZero: [Fail to read a file from disk]
-            ExceptionZero: [Fail to acess a file from disk]
-            ExceptionZero: [host connected return a erro mensage]
+            ExceptZen: [Fail to read a file from disk]
+            ExceptZen: [Fail to acess a file from disk]
+            ExceptZen: [host connected return a erro mensage]
         Returns:
             int: [size of file sended]
         """
@@ -148,9 +148,9 @@ class Protocol(object):
         Args:
             path_file_name (str): [path of file]
         Raises:
-            ExceptionZero: [Fail to read a file from disk]
-            ExceptionZero: [Fail to acess a file from disk]
-            ExceptionZero: [host connected return a erro mensage]
+            ExceptZen: [Fail to read a file from disk]
+            ExceptZen: [Fail to acess a file from disk]
+            ExceptZen: [host connected return a erro mensage]
         Returns:
             int: [size of file sended]
         """
@@ -166,7 +166,7 @@ class Protocol(object):
             self.sendErro(msg_erro)
             raise ExceptZen(msg_erro)
 
-        except Exception as exp:
+        except ExceptZen as exp:
             msg_erro = f'Critical error IO file{path_file_name} :{str(exp)}'
             self.sendErro(msg_erro)
             raise ExceptZen(msg_erro)
@@ -195,9 +195,9 @@ class Protocol(object):
         Args:
             path_file_name (str): [path to save a file]
         Raises:
-            ExceptionZero: [Fail to create a dir]
-            Exception: [Fail to save a file]
-            Exception: [Receive a unspected command]
+            ExceptZen: [Fail to create a dir]
+            ExceptZen: [Fail to save a file]
+            ExceptZen: [Receive a unspected command]
         Returns:
             int: [description]
         """
@@ -220,12 +220,12 @@ class Protocol(object):
                     self.sendString(ProtocolCode.OK, 'OK')
                     return len(buffer_arquivo)
 
-            except Exception as exp:
+            except ExceptZen as exp:
                 msg_erro = 'Erro ao gravar arquivo:{0} Erro:{1}'.format(path_file_name, str(exp))
                 self.sendErro(msg_erro)
-                raise Exception(msg_erro)
+                raise ExceptZen(msg_erro)
 
         else:
             msg_erro = 'Nao recebi o arquivo:{0} Erro ID:{1}'.format(path_file_name, str(id))
             self.sendErro(msg_erro)
-            raise Exception(msg_erro)
+            raise ExceptZen(msg_erro)

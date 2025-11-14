@@ -1,6 +1,6 @@
 '''
 Created on 20251031
-Update on 20251107
+Update on 20251114
 @author: Eduardo Pagotto
 '''
 
@@ -9,6 +9,8 @@ import zlib
 from typing import Tuple
 from dataclasses import dataclass
 from enum import IntEnum
+
+from zencomm.utils.exceptzen import ExceptZen
 
 class ProtocolCode(IntEnum):
     OPEN = 1
@@ -73,18 +75,18 @@ class Header:
         crc_header_recive = zlib.crc32(inner_fields)
 
         if self.crc_header != crc_header_recive:
-            raise Exception('wrong header crc')
+            raise ExceptZen('wrong header crc')
 
     def decode_d(self, buffer : bytes) -> bytes:
         buffer_dados = bytearray(buffer)
 
         crcCalc = zlib.crc32(buffer_dados)
         if self.crc_zip != crcCalc:
-            raise Exception('wrong payload crc')
+            raise ExceptZen('wrong payload crc')
 
         binario = zlib.decompress(buffer_dados)
 
         if len(binario) != self.size:
-            raise Exception('wrong payload size')
+            raise ExceptZen('wrong payload size')
 
         return binario

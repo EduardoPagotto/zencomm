@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Created on 20251030
-Update on 20251112
+Update on 20251114
 @author: Eduardo Pagotto
 '''
 
@@ -18,7 +18,7 @@ from zencomm.logger import setup_queue_logging
 from zencomm.asy import Protocol, socket_client
 
 logger_listern = setup_queue_logging('./log/async_client.log')
-logger = logging.getLogger('async_server')
+logger = logging.getLogger('async_client')
 
 async def main():
 
@@ -31,7 +31,7 @@ async def main():
         reader, writer = await socket_client(parsed_url, timeout)
         if reader and writer:
 
-                p = Protocol(reader, writer)
+                p = Protocol(reader, writer, 30)
 
                 await p.sendString(ProtocolCode.COMMAND, 'cliente envia: teste 123....')
                 c, m = await p.receiveString()

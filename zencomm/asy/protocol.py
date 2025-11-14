@@ -1,21 +1,25 @@
 '''
 Created on 20241001
-Update on 20251108
+Update on 20251114
 @author: Eduardo Pagotto
 '''
 
+import asyncio
 from typing import Tuple
 
 from zencomm import __version__ as VERSION
 from zencomm.header import ProtocolCode, Header, HEADER_SIZE, BLOCK_SIZE
+from zencomm.utils.exceptzen import ExceptZen
 
 class Protocol(object):
 
-    def __init__(self, reader, writer):
+    def __init__(self, reader, writer, timeout : int):
         self.__reader = reader
         self.__writer = writer
+        self.__timeout = timeout
         self.version = VERSION
         self.peer_version = ''
+
 
     async def __sendBlocks(self, _buffer : bytes) -> int:
 
@@ -47,10 +51,11 @@ class Protocol(object):
             if tam > BLOCK_SIZE:
                 tam = BLOCK_SIZE
 
-            chunk : bytes = await self.__reader.readexactly(tam)
+            #chunk : bytes = await self.__reader.readexactly(tam)
+            chunk : bytes = await asyncio.wait_for(self.__reader.readexactly(tam), timeout=self.__timeout)
 
             if chunk == b'':
-                raise Exception("receive empty block")
+                raise ExceptZen("receive empty block")
 
             buffer_local += chunk
 
@@ -80,10 +85,10 @@ class Protocol(object):
         elif header.id == ProtocolCode.CLOSE:
             #self.log.debug('closure receved:%s', binario.decode('UTF-8'))
             await self.close()
-            #raise Exception('close received:{0}'.format(binario.decode('UTF-8')))
+            #raise ExceptZen('close received:{0}'.format(binario.decode('UTF-8')))
 
         elif header.id == ProtocolCode.ERRO:
-            raise Exception('{0}'.format(binario.decode('UTF-8')))
+            raise ExceptZen('{0}'.format(binario.decode('UTF-8')))
 
         return ProtocolCode(header.id), binario
 
@@ -113,7 +118,7 @@ class Protocol(object):
             #self.log.info('handshake with server: %s', msg)
             return msg
 
-        raise Exception('Fail to Handshake')
+        raise ExceptZen('Fail to Handshake')
 
     async def exchange(self, input : str) -> str:
 
@@ -122,7 +127,7 @@ class Protocol(object):
         if id == ProtocolCode.RESULT:
             return msg
 
-        raise Exception('Resposta invalida: ({0} : {1})'.format(id, msg))
+        raise ExceptZen('Resposta invalida: ({0} : {1})'.format(id, msg))
 
     async def sendErro(self, msg : str) -> int:
         return await self.sendString(ProtocolCode.ERRO, msg)

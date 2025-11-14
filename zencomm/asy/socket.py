@@ -1,19 +1,22 @@
 '''
 Created on 20241001
-Update on 20251112
+Update on 20251114
 @author: Eduardo Pagotto
 '''
 
 import logging
 import os
 import asyncio
-import signal
 from urllib.parse import urlparse
+from functools import partial
+
+from zencomm.utils.exceptzen import ExceptZen
 
 class SocketServer(object):
-    def __init__(self, url : str, func_handler):
+    def __init__(self, url : str, func_handler, stop_event : asyncio.Event):
         self.parsed_url = urlparse(url)
         self.func_handler = func_handler
+        self.stop_event = stop_event
         self.log = logging.getLogger(__name__)
 
     async def __main_tcp(self):
@@ -23,13 +26,32 @@ class SocketServer(object):
         host = self.parsed_url.hostname
         port = self.parsed_url.port
 
-        server = await asyncio.start_server(self.func_handler, host, port)
+        # partial to send stop_event as first parameter
+        server = await asyncio.start_server(partial(self.func_handler, self.stop_event), host, port)
         addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
 
         self.log.info(f"Serving on {addrs}")
 
         async with server:
-            await server.serve_forever()
+
+            self.log.info(f"Serving on {self.parsed_url.geturl()}")
+
+            serve_task = asyncio.create_task(server.serve_forever())
+
+            await self.stop_event.wait() # Wait for the shutdown signal
+
+            self.log.warning("Closing server...")
+            server.close()  # Stop accepting new connections
+            await server.wait_closed() # Wait for existing connections to close gracefully
+
+            # Cancel the serve_forever task
+            serve_task.cancel()
+            try:
+                await serve_task
+            except asyncio.CancelledError:
+                self.log.warning("serve_forever task cancelled")
+
+            await serve_task
 
     async def __main_unix(self):
         """
@@ -40,29 +62,16 @@ class SocketServer(object):
         if os.path.exists(path):
             os.remove(path)
 
-        server = await asyncio.start_unix_server(self.func_handler, path)
+        server = await asyncio.start_unix_server(partial(self.func_handler, self.stop_event), path)
         async with server:
 
             self.log.info(f"Serving on {self.parsed_url.geturl()}")
 
-            #await server.serve_forever()
-            # Create a task for serve_forever to allow it to be cancelled
             serve_task = asyncio.create_task(server.serve_forever())
 
-            # Set up a signal handler for graceful shutdown
-            loop = asyncio.get_running_loop()
-            stop_event = asyncio.Event()
+            await self.stop_event.wait() # Wait for the shutdown signal
 
-            def signal_handler():
-                #self.log.warning("Shutdown signal received...")
-                stop_event.set()
-
-            loop.add_signal_handler(signal.SIGINT, signal_handler)
-            loop.add_signal_handler(signal.SIGTERM, signal_handler)
-
-            await stop_event.wait() # Wait for the shutdown signal
-
-            self.log.info("Closing server...")
+            self.log.warning("Closing server...")
             server.close()  # Stop accepting new connections
             await server.wait_closed() # Wait for existing connections to close gracefully
 
@@ -107,4 +116,4 @@ async def socket_client(parsed_url : urlparse, timeout : int) -> tuple[asyncio.S
         return reader, writer
 
     else:
-        raise Exception(f"scheme {parsed_url.scheme} invalid")
+        raise ExceptZen(f"scheme {parsed_url.scheme} invalid")
