@@ -13,13 +13,13 @@ from functools import partial
 from zencomm.utils.exceptzen import ExceptZen
 
 class SocketServer(object):
-    def __init__(self, url : str, func_handler, stop_event : asyncio.Event):
+    def __init__(self, url : str, func_handler : function):
+
         self.parsed_url = urlparse(url)
         self.func_handler = func_handler
-        self.stop_event = stop_event
         self.log = logging.getLogger(__name__)
 
-    async def __main_tcp(self):
+    async def __main_tcp(self, stop_event : asyncio.Event):
         """
         Starts an asyncio TCP server.
         """
@@ -27,7 +27,7 @@ class SocketServer(object):
         port = self.parsed_url.port
 
         # partial to send stop_event as first parameter
-        server = await asyncio.start_server(partial(self.func_handler, self.stop_event), host, port)
+        server = await asyncio.start_server(partial(self.func_handler, stop_event), host, port)
         addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
 
         self.log.info(f"Serving on {addrs}")
@@ -38,7 +38,7 @@ class SocketServer(object):
 
             serve_task = asyncio.create_task(server.serve_forever())
 
-            await self.stop_event.wait() # Wait for the shutdown signal
+            await stop_event.wait() # Wait for the shutdown signal
 
             self.log.warning("Closing server...")
             server.close()  # Stop accepting new connections
@@ -53,7 +53,7 @@ class SocketServer(object):
 
             await serve_task
 
-    async def __main_unix(self):
+    async def __main_unix(self, stop_event : asyncio.Event):
         """
         Starts an asyncio Unix Domain Socket server.
         """
@@ -62,14 +62,14 @@ class SocketServer(object):
         if os.path.exists(path):
             os.remove(path)
 
-        server = await asyncio.start_unix_server(partial(self.func_handler, self.stop_event), path)
+        server = await asyncio.start_unix_server(partial(self.func_handler, stop_event), path)
         async with server:
 
             self.log.info(f"Serving on {self.parsed_url.geturl()}")
 
             serve_task = asyncio.create_task(server.serve_forever())
 
-            await self.stop_event.wait() # Wait for the shutdown signal
+            await stop_event.wait() # Wait for the shutdown signal
 
             self.log.warning("Closing server...")
             server.close()  # Stop accepting new connections
@@ -82,13 +82,13 @@ class SocketServer(object):
             except asyncio.CancelledError:
                 self.log.warning("serve_forever task cancelled")
 
-    async def execute(self):
+    async def execute(self, stop_event : asyncio.Event):
 
         if self.parsed_url.scheme == "tcp":
-            return await self.__main_tcp()
+            return await self.__main_tcp(stop_event)
 
         elif self.parsed_url.scheme == "unix":
-            return await self.__main_unix()
+            return await self.__main_unix(stop_event)
 
         else:
             self.log.info("Invalid SERVER_TYPE. Choose 'TCP' or 'UNIX'.")

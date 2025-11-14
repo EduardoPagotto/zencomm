@@ -67,9 +67,9 @@ async def main():
     loop.add_signal_handler(signal.SIGINT, signal_handler)
     loop.add_signal_handler(signal.SIGTERM, signal_handler)
 
-    server = SocketServer('unix:///tmp/teste0.sock', handle_client, stop_event)
+    server = SocketServer('unix:///tmp/teste0.sock', handle_client)
 
-    await server.execute()
+    await server.execute(stop_event)
 
     logger.info("server stop.")
 
